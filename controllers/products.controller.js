@@ -23,8 +23,34 @@ const getProducts = (req, res) => {
         return res.send(products)
     });
 }
-
+const getProductsById = (req, res) => {
+    let _id = req.params.id;
+    productModel.findOne({ "_id": _id })
+        .then((product) => {
+            return res.status(200).send(product)
+        })
+        .catch((err) => {
+            return res.status(200).send(err)
+        })
+}
+const getActive = (req, res) => {
+    productModel.find({ isActive: true })
+        .then((products) => {
+            return res.status(200).send(products)
+        })
+        .catch((err) => {
+            return res.status(200).send(err)
+        })
+}
+const getRange = (req, res) => {
+    productModel.find({ 'details.price': { $gt: 50, $lt: 500 } }).then((products) => {
+        return res.send(products)
+    })
+}
 module.exports = {
     create: createProduct,
-    getAll: getProducts
+    getAll: getProducts,
+    getById: getProductsById,
+    getActive,
+    getRange
 }
