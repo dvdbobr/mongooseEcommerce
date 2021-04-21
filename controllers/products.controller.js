@@ -84,10 +84,55 @@ const getRange = async (req, res) => {
         return res.status(200).send(err)
     }
 }
+const updateActiveAndDiscount = (req, res) => {
+    const id = req.params.id;
+    const { isActive, discount } = req.body
+    const updates = Object.keys(req.body)
+    const allowedUpdates = ["isActive", "discount"]
+    const isValidOperation = updates.every((update) => {
+        return allowedUpdates.includes(update)
+    })
+    if (!isValidOperation)
+        return res.status(400).send({ error: 'invalid Updates' })
+    productModel.findByIdAndUpdate(id, { isActive: isActive, "details.discount": discount }, { new: true, runValidators: true }, (err, result) => {
+        if (err) {
+            return res.send(err);
+        }
+        else {
+            res.send(result);
+        }
+    })
+}
+const deleteProductById = async (req, res) => {
+    const id = req.params.id;
+    try {
+        const product = await productModel.findByIdAndDelete(id)
+        if (!product)
+            return res.send("no such product");
+        res.send(product)
+    }
+    catch (err) {
+        res.send(err);
+    }
+}
+const deleteProducts = async (req, res) => {
+    try {
+        const products = await productModel.remove({})
+        if (!products)
+            return res.send("no products left");
+        res.send(products)
+    }
+    catch (err) {
+        res.send(err);
+    }
+}
 module.exports = {
     create: createProduct,
     getAll: getProducts,
     getById: getProductsById,
     getActive,
-    getRange
+    getRange,
+    updateProductById: updateActiveAndDiscount,
+    deleteProductById,
+    deleteProducts
 }
